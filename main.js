@@ -1,64 +1,133 @@
-var title = 'The [X] of [Y]';
+var fontWeightList = [
+'lighter',
+'bolder'
+];
 
+var titleElement = document.getElementById("title");
+titleElement.innerHTML = getTitle();
+setTitleFormat(titleElement);
+
+function setTitleFormat(titleElement) {
+    var fontStyleList = [
+        'normal',
+        'italic',
+        'oblique'
+        ];
+
+    var fontFamilyList = [
+        'Impact',
+        'Lucida Sans Unicode',
+        'Courier New',
+        'Helvetica',
+        'Book Antiqua'
+        ];
+    
+    titleElement.style.fontWeight = getRandomFromArray(fontWeightList);
+    titleElement.style.fontStyle = getRandomFromArray(fontStyleList);
+    titleElement.style.fontFamily = getRandomFromArray(fontFamilyList);
+}
+
+function getTitle() {
+    var title = 'The [X] of [Y]';
+    
+    var titleXList = [
+        'Failure',
+        'Ambition',
+        'Folly',
+        'Consequences',
+        'Arrogance',
+        'Audacity',
+        'Humility',
+        'Hopelessness'
+        ];
+
+    var titleYList = [
+        'Meaning',
+        'Humanity',
+        'Existence',
+        'Peace',
+        'Creativity',
+        'Creation'
+    ];
+
+
+    title = title.replace('[X]', getRandomFromArray(titleXList));
+    title = title.replace('[Y]', getRandomFromArray(titleYList));
+    return title;
+}
 
 function getRandomFromArray(array){
     var randIndex = Math.floor(Math.random() * array.length);
     return array[randIndex];
 }
 
-        
-
 var screenWidth = 500;
 var screenHeight = 500;
 
 var game = new Phaser.Game(screenWidth, screenHeight, Phaser.AUTO, 'gameDiv');
 
-// Image names
-// --Pipes
-var pipeImages = [
-    'pipe',
-    'prison'
-];
-
-var pipeImage = getRandomFromArray(pipeImages);
-
-// -- Bird
-var birdImages = [
-    'bird',
-    'dao',
-    'dollar',
-    'clock',
-    'heart'
-];
-
-var birdImage = getRandomFromArray(birdImages);
-
-
-// -- Background
-var bgImages = [
-    'sky',
-    'rose',
-    'market',
-    'persistence-of-memory'
-];
-
-var bgImage = getRandomFromArray(bgImages);
-
+var newAssetLoad = true;
+var pipeImage;
+var birdImage;
+var bgImage;
 
 var mainState = {
 
+    chooseAssets: function() {
+        // Image names
+        // --Pipes
+        var pipeImages = [
+            'pipe',
+            'prison'
+        ];
+
+        pipeImage = getRandomFromArray(pipeImages);
+
+        // -- Bird
+        var birdImages = [
+            'bird',
+            'dao',
+            'dollar',
+            'clock',
+            'heart'
+        ];
+
+        birdImage = getRandomFromArray(birdImages);
+
+
+        // -- Background
+        var bgImages = [
+            'sky',
+            'rose',
+            'market',
+            'persistence-of-memory'
+        ];
+
+        bgImage = getRandomFromArray(bgImages);
+    },
+    
     preload: function() { 
+        if (newAssetLoad) {
+            this.chooseAssets();
+            newAssetLoad = false;
+        }
+        
         game.stage.backgroundColor = '#71c5cf';
 
         this.loadBGImages();
 
-        this.loadBirdImage();
-
-        this.loadPipeImage();
-
-
+        this.pipes = new Pipes(this.game);
+        this.pipes.preload();
+        
         // Load the jump sound
-        game.load.audio('jump', 'assets/jump.wav');     
+        game.load.audio('jump', 'assets/jump.wav');
+        
+        // Add the jump sound
+        this.jumpSound = this.game.add.audio('jump');
+        
+        this.bird = new Bird(this.game, this.jumpSound);
+        this.bird.preload();
+     
     },
 
     loadBGImages: function() {
@@ -86,50 +155,6 @@ var mainState = {
         }  
     },
 
-    loadBirdImage: function() {
-        var birdPath = 'assets/bird/';
-
-        switch (birdImage)
-        {
-            case 'dao':
-                birdPath += 'taiji.jpg';
-                break;
-            case 'dollar':
-                birdPath += 'dollar.jpg';
-                break;
-            case 'clock':
-                birdPath += 'clock.png';
-                break;
-            case 'heart':
-                birdPath += 'heart.png';
-                break;
-            default: // 'bird'
-                birdPath += 'bird.png';
-                break;
-        }
-
-        game.load.image(birdImage, birdPath); 
-    },
-
-    loadPipeImage: function() {
-        var pipePath = 'assets/pipe/';
-
-        switch (pipeImage)
-        {
-            case 'prison':
-                pipePath += 'prison-bars.jpg'
-                break;
-            case 'pipe':
-                pipePath += 'pipe.png';
-                break;
-            default: // 'pipe'
-                pipePath += 'pipe.png';
-                break;
-        }
-
-        game.load.image(pipeImage, pipePath); 
-    },
-
     create: function() { 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -143,18 +168,10 @@ var mainState = {
             this.background.height = screenHeight;
         }
 
-        this.pipes = game.add.group();
-        this.pipes.enableBody = true;
-        this.pipes.createMultiple(20, pipeImage);             
+        
+        this.bird.create();
+        this.pipes.create();
 
-        this.bird = this.game.add.sprite(100, 245, birdImage);
-        this.bird.height = 50;
-        this.bird.width = 50;
-        game.physics.arcade.enable(this.bird); 
-
-        // New anchor position
-        this.bird.anchor.setTo(-0.2, 0.5); 
- 
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this); 
                
@@ -163,41 +180,25 @@ var mainState = {
         this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
 
         this.firstPipe = true;
-        
-        // Add the jump sound
-        this.jumpSound = this.game.add.audio('jump');
     },
 
     update: function() {
-        if (this.bird.inWorld == false)
+        if (this.bird.sprite.inWorld == false)
             this.restartGame(); 
 
-        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this); 
-
-        // Slowly rotate the bird downward, up to a certain point.
-        if (this.bird.angle < 20)
-            this.bird.angle += 1;     
+        this.bird.update(game, this.pipes);
     },
 
     jump: function() {
         if (!this.hasStarted)
         {
-            this.bird.body.gravity.y = 1000;
+            this.bird.start();
             this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);
-            this.hasStarted = true; 
+            this.hasStarted = true;
+            return;
         }
-
-        // If the bird is dead, he can't jump
-        if (this.bird.alive == false)
-            return; 
-
-        this.bird.body.velocity.y = -350;
-
-        // Jump animation
-        game.add.tween(this.bird).to({angle: -20}, 100).start();
-
-        // Play sound
-        this.jumpSound.play();
+        
+        this.bird.jump();
     },
 
     hitPipe: function() {
@@ -212,35 +213,19 @@ var mainState = {
         this.game.time.events.remove(this.timer);
     
         // Go through all the pipes, and stop their movement
-        this.pipes.forEachAlive(function(p){
-            p.body.velocity.x = 0;
-        }, this);
+        this.pipes.hitPipe();
     },
 
     restartGame: function() {
         game.state.start('main');
     },
 
-    addOnePipe: function(x, y) {
-        var pipe = this.pipes.getFirstDead();
-
-        pipe.reset(x, y);
-        pipe.body.velocity.x = -200;  
-        pipe.checkWorldBounds = true;
-        pipe.outOfBoundsKill = true;
-    },
+    
 
 
     addRowOfPipes: function() {
-        var holeWidth = 2;
+        this.pipes.addRowOfPipes();
         
-        // 1 - 6, from range of 0-7
-        var hole = Math.floor(Math.random()* (8 - holeWidth - 1))+1;
-
-        
-        for (var i = 0; i < 8; i++)
-            if (i < hole || i > hole + holeWidth - 1 ) 
-                this.addOnePipe(400, i*60+10);   
         if (this.firstPipe)
         {
             this.firstPipe = false;
@@ -255,55 +240,3 @@ var mainState = {
 
 game.state.add('main', mainState);  
 game.state.start('main'); 
-
-
-
-var titleXList = [
-'Failure',
-'Ambition',
-'Folly',
-'Consequences',
-'Arrogance',
-'Audacity',
-'Humility',
-'Hopelessness'
-];
-
-var titleYList = [
-'Meaning',
-'Humanity',
-'Existence',
-'Peace',
-'Creativity',
-'Creation'
-];
-
-var fontWeightList = [
-'lighter',
-'bolder'
-];
-
-var fontStyleList = [
-'normal',
-'italic',
-'oblique'
-];
-
-var fontFamilyList = [
-'Impact',
-'Lucida Sans Unicode',
-'Courier New',
-'Helvetica',
-'Book Antiqua'
-];
-
-title = title.replace('[X]', getRandomFromArray(titleXList));
-title = title.replace('[Y]', getRandomFromArray(titleYList));
-
-var titleElement = document.getElementById("title");
-
-titleElement.innerHTML = title;
-
-titleElement.style.fontWeight = getRandomFromArray(fontWeightList);
-titleElement.style.fontStyle = getRandomFromArray(fontStyleList);
-titleElement.style.fontFamily = getRandomFromArray(fontFamilyList);
