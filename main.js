@@ -1,70 +1,5 @@
-var fontWeightList = [
-'lighter',
-'bolder'
-];
-
-var titleElement = document.getElementById("title");
-titleElement.innerHTML = getTitle();
-setTitleFormat(titleElement);
-
-function setTitleFormat(titleElement) {
-    var fontStyleList = [
-        'normal',
-        'italic',
-        'oblique'
-        ];
-
-    var fontFamilyList = [
-        'Impact',
-        'Lucida Sans Unicode',
-        'Courier New',
-        'Helvetica',
-        'Book Antiqua'
-        ];
-    
-    titleElement.style.fontWeight = getRandomFromArray(fontWeightList);
-    titleElement.style.fontStyle = getRandomFromArray(fontStyleList);
-    titleElement.style.fontFamily = getRandomFromArray(fontFamilyList);
-}
-
-function getTitle() {
-    var title = 'The [X] of [Y]';
-    
-    var titleXList = [
-        'Failure',
-        'Ambition',
-        'Folly',
-        'Consequences',
-        'Arrogance',
-        'Audacity',
-        'Humility',
-        'Hopelessness'
-        ];
-
-    var titleYList = [
-        'Meaning',
-        'Humanity',
-        'Existence',
-        'Peace',
-        'Creativity',
-        'Creation'
-    ];
-
-
-    title = title.replace('[X]', getRandomFromArray(titleXList));
-    title = title.replace('[Y]', getRandomFromArray(titleYList));
-    return title;
-}
-
-function getRandomFromArray(array){
-    var randIndex = Math.floor(Math.random() * array.length);
-    return array[randIndex];
-}
-
 var screenWidth = 500;
 var screenHeight = 500;
-
-var game = new Phaser.Game(screenWidth, screenHeight, Phaser.AUTO, 'gameDiv');
 
 var newAssetLoad = true;
 var pipeImage;
@@ -112,9 +47,8 @@ var mainState = {
             newAssetLoad = false;
         }
         
-        game.stage.backgroundColor = '#71c5cf';
-
-        this.loadBGImages();
+        this.background = new Background(this.game);
+        this.background.preload(); 
 
         this.pipes = new Pipes(this.game);
         this.pipes.preload();
@@ -130,52 +64,19 @@ var mainState = {
      
     },
 
-    loadBGImages: function() {
-        var bgPath = 'assets/background/';
-
-        switch (bgImage)
-        {
-            case 'rose':
-                bgPath += 'rose.png';
-                break;
-            case 'market':
-                bgPath += 'stockmarket.jpg';
-                break;
-            case 'persistence-of-memory':
-                bgPath += 'persistence-of-memory.jpg';
-                break;
-            default: // 'sky'
-                bgPath = '';
-                break;
-        }
-
-        if (bgImage != 'sky')
-        {
-           game.load.image(bgImage, bgPath);
-        }  
-    },
-
     create: function() { 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         // Pause the action, wait for player to jump first
         this.hasStarted = false;
 
-        if (bgImage != 'sky')
-        {
-            this.background = this.game.add.sprite(0, 0, bgImage);
-            this.background.width = screenWidth;
-            this.background.height = screenHeight;
-        }
-
-        
+        this.background.create();
         this.bird.create();
         this.pipes.create();
 
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this); 
                
-
         this.score = 0;
         this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
 
@@ -220,9 +121,6 @@ var mainState = {
         game.state.start('main');
     },
 
-    
-
-
     addRowOfPipes: function() {
         this.pipes.addRowOfPipes();
         
@@ -237,6 +135,12 @@ var mainState = {
         this.labelScore.text = this.score;  
     },
 };
+
+var titleElement = document.getElementById("title");
+titleElement.innerHTML = getTitle();
+setTitleFormat(titleElement);
+var game = new Phaser.Game(screenWidth, screenHeight, Phaser.AUTO, 'gameDiv');
+
 
 game.state.add('main', mainState);  
 game.state.start('main'); 
