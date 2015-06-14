@@ -85,8 +85,10 @@ var mainState = {
 
     update: function() {
         if (this.bird.sprite.inWorld == false)
+        {
             this.restartGame(); 
-
+        }
+        
         this.bird.update(game, this.pipes);
     },
 
@@ -94,6 +96,7 @@ var mainState = {
         if (!this.hasStarted)
         {
             this.bird.start();
+            this.background.start();
             this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);
             this.hasStarted = true;
             return;
@@ -140,7 +143,6 @@ var titleElement = document.getElementById("title");
 titleElement.innerHTML = getTitle();
 setTitleFormat(titleElement);
 var game = new Phaser.Game(screenWidth, screenHeight, Phaser.AUTO, 'gameDiv');
-
 
 game.state.add('main', mainState);  
 game.state.start('main'); 

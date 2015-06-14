@@ -35,13 +35,20 @@ Background.prototype = {
     create: function() {
         if (bgImage != 'sky')
         {
-            this.background = this.game.add.sprite(0, 0, bgImage);
-            this.background.width = screenWidth;
-            this.background.height = screenHeight;
+            this.sprite = this.game.add.sprite(0, 0, bgImage);
+            this.sprite.width = screenWidth * 3;
+            this.sprite.height = screenHeight * 3;
+            
+            this.sprite.y = getRandomFromRange(-(this.sprite.height - screenHeight), this.sprite.height - screenHeight);
         }
         else
         {
             this.game.stage.backgroundColor = '#71c5cf';
         }
     },
+    
+    start: function() {
+        this.game.physics.arcade.enable(this.sprite);
+        this.sprite.body.velocity.x = -10;
+    }
 };
