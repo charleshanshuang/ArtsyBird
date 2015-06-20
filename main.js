@@ -90,6 +90,8 @@ var mainState = {
         }
         
         this.bird.update(game, this.pipes);
+        
+        this.background.update();
     },
 
     jump: function() {

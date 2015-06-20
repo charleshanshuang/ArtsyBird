@@ -50,5 +50,16 @@ Background.prototype = {
     start: function() {
         this.game.physics.arcade.enable(this.sprite);
         this.sprite.body.velocity.x = -10;
+    },
+    
+    update: function() {
+        if (bgImage != 'sky' && this.sprite.x <= -(this.sprite.width - screenWidth)) //this.sprite.width - screenWidth)
+        {
+            this.tweenBack();
+        }
+    },
+    
+    tweenBack: function() {
+        game.add.tween(this.sprite).to({x: 0}, 1000).start();
     }
 };

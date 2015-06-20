@@ -3,6 +3,7 @@ Bird = function(game, jumpSound) {
     this.sprite = null;
     this.isAlive = true;
     this.jumpSound = jumpSound;
+    this.tweenPositive = true;
 };
 
 Bird.prototype = {
@@ -41,25 +42,53 @@ Bird.prototype = {
         this.sprite = this.game.add.sprite(100, 245, birdImage);
         this.sprite.height = 50;
         this.sprite.width = 50;
+        this.sprite.angle = 20;
+        this.sprite.pivot.x = this.sprite.width / 2;
+        this.sprite.pivot.y = this.sprite.height / 2;
+        
         // Add gravity to the bird to make it fall
         this.game.physics.arcade.enable(this.sprite);
         
         // New anchor position
         this.sprite.anchor.setTo(-0.2, 0.5); 
- 
     },
     
     start: function() {
         this.sprite.body.gravity.y = 1000;
     },
     
+    
     update: function(game, pipes) {
-        if (this.isAlive === true)
+        if (!game.hasStarted)
         {
-            if (this.sprite.angle < 20)  
+            if (this.tweenPositive)
+            {
                 this.sprite.angle += 1;
-        
-            game.physics.arcade.overlap(this.sprite, pipes.pipes, this.killBird, null, this); 
+                
+                if (this.sprite.angle >= 20)
+                {
+                    this.tweenPositive = false;
+                }
+            }
+            else
+            {
+                this.sprite.angle -= 1;
+                
+                if (this.sprite.angle <=  -20)
+                {
+                    this.tweenPositive = true;
+                }
+            }
+        }
+        else
+        {
+            if (this.isAlive === true)
+            {
+                if (this.sprite.angle < 20)  
+                    this.sprite.angle += 1;
+
+                game.physics.arcade.overlap(this.sprite, pipes.pipes, this.killBird, null, this); 
+            }
         }
     },
     
