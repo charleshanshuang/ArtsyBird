@@ -13,24 +13,22 @@ Pipes.prototype = {
 
         switch (pipeImage)
         {
-            case 'prison':
-                pipePath += 'prison-bars.jpg'
+            case "1":
+            case "3":
+                pipePath += pipeImage + ".png";
                 break;
-            case 'pipe':
-                pipePath += 'pipe.png';
-                break;
-            default: // 'pipe'
-                pipePath += 'pipe.png';
+            default: 
+                pipePath += pipeImage + ".jpg";
                 break;
         }
-
-        game.load.image(pipeImage, pipePath); 
+        
+        game.load.image("pipe", pipePath); 
     },
     
     create: function() {
         this.pipes = game.add.group();
         this.pipes.enableBody = true;
-        this.pipes.createMultiple(20, pipeImage);
+        this.pipes.createMultiple(20, "pipe");
     },
     
     hitPipe: function() {

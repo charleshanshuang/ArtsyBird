@@ -1,9 +1,9 @@
-Bird = function(game, jumpSound) {
+Bird = function(game, jumpSound, mainState) {
     this.game = game;
     this.sprite = null;
-    this.isAlive = true;
     this.jumpSound = jumpSound;
     this.tweenPositive = true;
+    this.mainState = mainState;
 };
 
 Bird.prototype = {
@@ -17,29 +17,27 @@ Bird.prototype = {
 
         switch (birdImage)
         {
-            case 'dao':
-                birdPath += 'taiji.jpg';
+            case "1":
+            case "2":
+            case "4":
+                birdPath += birdImage + ".png";
                 break;
-            case 'dollar':
-                birdPath += 'dollar.jpg';
-                break;
-            case 'clock':
-                birdPath += 'clock.png';
-                break;
-            case 'heart':
-                birdPath += 'heart.png';
+            case "9":
+                birdPath += birdImage + ".gif";
                 break;
             default: // 'bird'
-                birdPath += 'bird.png';
+                birdPath += birdImage + ".jpg";
                 break;
         }
 
-        this.game.load.image(birdImage, birdPath); 
+        this.game.load.image("bird", birdPath); 
     },
     
     create: function() {
+        this.isAlive = true;
+        
         // Display the bird on the screen
-        this.sprite = this.game.add.sprite(100, 245, birdImage);
+        this.sprite = this.game.add.sprite(100, 245, "bird");
         this.sprite.height = 50;
         this.sprite.width = 50;
         this.sprite.angle = 20;
@@ -59,7 +57,7 @@ Bird.prototype = {
     
     
     update: function(game, pipes) {
-        if (!game.hasStarted)
+        if (!this.mainState.hasStarted)
         {
             if (this.tweenPositive)
             {
@@ -100,13 +98,11 @@ Bird.prototype = {
         // Make the bird jump 
         if (this.isAlive === true)
         {
-            // Add a vertical velocity to the bird
-            this.sprite.body.velocity.y = -350;
-            
             // If the bird is dead, he can't jump
             if (this.isAlive == false)
                 return; 
-
+            
+            // Add a vertical velocity to the bird
             this.sprite.body.velocity.y = -350;
 
             // Jump animation

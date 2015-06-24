@@ -12,39 +12,23 @@ Background.prototype = {
 
         switch (bgImage)
         {
-            case 'rose':
-                bgPath += 'rose.png';
+            case "1":
+                bgPath += bgImage.toString() + ".png";
                 break;
-            case 'market':
-                bgPath += 'stockmarket.jpg';
-                break;
-            case 'persistence-of-memory':
-                bgPath += 'persistence-of-memory.jpg';
-                break;
-            default: // 'sky'
-                bgPath = '';
+            default: 
+                bgPath += bgImage.toString() + ".jpg";
                 break;
         }
 
-        if (bgImage != 'sky')
-        {
-           this.game.load.image(bgImage, bgPath);
-        }  
+        this.game.load.image("background", bgPath);  
     },
 
     create: function() {
-        if (bgImage != 'sky')
-        {
-            this.sprite = this.game.add.sprite(0, 0, bgImage);
-            this.sprite.width = screenWidth * 3;
-            this.sprite.height = screenHeight * 3;
-            
-            this.sprite.y = getRandomFromRange(-(this.sprite.height - screenHeight), this.sprite.height - screenHeight);
-        }
-        else
-        {
-            this.game.stage.backgroundColor = '#71c5cf';
-        }
+        this.sprite = this.game.add.sprite(0, 0, "background");
+        this.sprite.width = screenWidth * 3;
+        this.sprite.height = screenHeight * 3;
+
+        this.sprite.y = getRandomFromRange(-(this.sprite.height - screenHeight), this.sprite.height - screenHeight);
     },
     
     start: function() {
@@ -53,7 +37,7 @@ Background.prototype = {
     },
     
     update: function() {
-        if (bgImage != 'sky' && this.sprite.x <= -(this.sprite.width - screenWidth)) //this.sprite.width - screenWidth)
+        if (this.sprite.x <= -(this.sprite.width - screenWidth)) //this.sprite.width - screenWidth)
         {
             this.tweenBack();
         }

@@ -9,59 +9,36 @@ var bgImage;
 var mainState = {
 
     chooseAssets: function() {
-        // Image names
-        // --Pipes
-        var pipeImages = [
-            'pipe',
-            'prison'
-        ];
+        pipeImage = getRandomFromRange(1, 5).toString();
 
-        pipeImage = getRandomFromArray(pipeImages);
-
-        // -- Bird
-        var birdImages = [
-            'bird',
-            'dao',
-            'dollar',
-            'clock',
-            'heart'
-        ];
-
-        birdImage = getRandomFromArray(birdImages);
-
-
-        // -- Background
-        var bgImages = [
-            'sky',
-            'rose',
-            'market',
-            'persistence-of-memory'
-        ];
-
-        bgImage = getRandomFromArray(bgImages);
+        birdImage = getRandomFromRange(1, 9).toString();
+        
+        bgImage = getRandomFromRange(1, 17).toString();
     },
     
     preload: function() { 
         if (newAssetLoad) {
             this.chooseAssets();
+            this.background = new Background(this.game);
+            this.background.preload();
+            
+            // Load the jump sound
+            game.load.audio('jump', 'assets/jump.wav');
+
+            // Add the jump sound
+            this.jumpSound = this.game.add.audio('jump');
+            
+            this.bird = new Bird(this.game, this.jumpSound, this);
+            this.bird.preload();
+            
+            this.pipes = new Pipes(this.game);
+            this.pipes.preload();
+
+            this.title = getTitle();
+            
             newAssetLoad = false;
         }
         
-        this.background = new Background(this.game);
-        this.background.preload(); 
-
-        this.pipes = new Pipes(this.game);
-        this.pipes.preload();
-        
-        // Load the jump sound
-        game.load.audio('jump', 'assets/jump.wav');
-        
-        // Add the jump sound
-        this.jumpSound = this.game.add.audio('jump');
-        
-        this.bird = new Bird(this.game, this.jumpSound);
-        this.bird.preload();
-     
     },
 
     create: function() { 
@@ -76,10 +53,23 @@ var mainState = {
 
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this); 
-               
+        
+        this.game.input.onDown.add(this.jump, this);
+        
         this.score = 0;
         this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });  
 
+        this.labelTitle = this.game.add.text(screenWidth / 2, screenHeight - 20, this.title, { font: "30px Arial", fill: "#ffffff" });
+        setTitleFormat(this.labelTitle);
+        this.labelTitle.anchor.set(0.5);
+        this.labelTitle.stroke = "#000000";
+        this.labelTitle.strokeThickness = 6;
+        this.labelTitle.shadowColor = "#000009";
+        this.labelTitle.shadowOffsetX = 5;
+        this.labelTitle.shadowOffsetY = 5;
+        
+        
+        
         this.firstPipe = true;
     },
 
@@ -101,7 +91,6 @@ var mainState = {
             this.background.start();
             this.timer = this.game.time.events.loop(1500, this.addRowOfPipes, this);
             this.hasStarted = true;
-            return;
         }
         
         this.bird.jump();
@@ -141,9 +130,6 @@ var mainState = {
     },
 };
 
-var titleElement = document.getElementById("title");
-titleElement.innerHTML = getTitle();
-setTitleFormat(titleElement);
 var game = new Phaser.Game(screenWidth, screenHeight, Phaser.AUTO, 'gameDiv');
 
 game.state.add('main', mainState);  
