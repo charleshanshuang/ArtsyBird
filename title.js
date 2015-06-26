@@ -34,7 +34,18 @@ function getTitle() {
         'Arrogance',
         'Audacity',
         'Humility',
-        'Hopelessness'
+        'Hopelessness',
+        'Reckoning',
+        'Treachery',
+        'Fate',
+        'Hunger',
+        'Thirst',
+        'Journey',
+        'Struggle',
+        'Persistence',
+        'Desecration',
+        'Birth',
+        'Death'
         ];
 
     var titleYList = [
@@ -42,8 +53,16 @@ function getTitle() {
         'Humanity',
         'Existence',
         'Peace',
-        'Creativity',
-        'Creation'
+        'Creation',
+        'Heaven',
+        'Hell',
+        'the Earth',
+        'Dreams',
+        'Flight',
+        'Sainthood',
+        'Beauty',
+        'Life',
+        'Justice'
     ];
 
 
