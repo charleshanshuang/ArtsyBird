@@ -48,7 +48,7 @@ Bird.prototype = {
         this.game.physics.arcade.enable(this.sprite);
         
         // New anchor position
-        this.sprite.anchor.setTo(-0.2, 0.5); 
+        this.sprite.anchor.setTo(0.5, 0.5); 
     },
     
     start: function() {
@@ -87,11 +87,15 @@ Bird.prototype = {
 
                 game.physics.arcade.overlap(this.sprite, pipes.pipes, this.killBird, null, this); 
             }
+            else
+            {
+                this.sprite.angle += 10;
+            }
         }
     },
     
     killBird: function() {
-        this.isAlive = false;  
+        this.isAlive = false;
     },
     
     jump: function() {
