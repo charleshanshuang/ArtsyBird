@@ -8,6 +8,49 @@ var bgImage;
 
 var mainState = {
 
+    init: function() {
+        this.input.maxPointers = 1;
+        
+        if (this.game.device.desktop)
+        {
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(500, 500, 500, 500);
+            this.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignVertically = true;
+        }
+        else
+        {
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(500, 500, 500, 500);
+            this.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignVertically = true;
+            this.scale.forceOrientation(false, true);
+            this.scale.setResizeCallback(this.gameResized, this);
+            this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
+            this.scale.leaveIncorrectOrientation.add(this.leaveIncorrectOrientation, this);
+        }
+    
+    },
+    
+    gameResized: function (width, height) {
+    },
+    
+    enterIncorrectOrientation: function () {
+
+        this.game.orientated = false;
+
+        document.getElementById('orientation').style.display = 'block';
+
+    },
+
+    leaveIncorrectOrientation: function () {
+
+        this.game.orientated = true;
+
+        document.getElementById('orientation').style.display = 'none';
+
+    },
+    
     chooseAssets: function() {
         pipeImage = getRandomFromRange(1, 5).toString();
 
