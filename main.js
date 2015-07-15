@@ -15,15 +15,11 @@ var mainState = {
         {
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             this.scale.setMinMax(500, 500, 500, 500);
-            this.scale.pageAlignHorizontally = true;
-            this.scale.pageAlignVertically = true;
         }
         else
         {
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             this.scale.setMinMax(500, 500, 500, 500);
-            this.scale.pageAlignHorizontally = true;
-            this.scale.pageAlignVertically = true;
             this.scale.forceOrientation(false, true);
             this.scale.setResizeCallback(this.gameResized, this);
             this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
